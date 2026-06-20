@@ -1,1 +1,49 @@
-.
+spec_version: 2
+description: Provision EC2 and S3 using Terraform
+
+inputs:
+  agent:
+    type: agent
+    default: Sample-Agent
+  aws_region:
+    type: string
+    default: ap-south-1
+  instance_type:
+    type: string
+    default: t3.micro
+  ssh_allowed_cidr:
+    type: string
+    default: 0.0.0.0/0
+  bucket_prefix:
+    type: string
+    default: torque-ec2-s3-demo
+
+grains:
+  terraform_infra:
+    kind: terraform
+    spec:
+      source:
+        store: terraform-repo
+        path: .
+      agent:
+        name: '{{ .inputs.agent }}'
+      inputs:
+        - aws_region: '{{ .inputs.aws_region }}'
+        - instance_type: '{{ .inputs.instance_type }}'
+        - ssh_allowed_cidr: '{{ .inputs.ssh_allowed_cidr }}'
+        - bucket_prefix: '{{ .inputs.bucket_prefix }}'
+      outputs:
+        - instance_id
+        - public_ip
+        - bucket_name
+        - bucket_arn
+
+outputs:
+  Instance_ID:
+    value: '{{ .grains.terraform_infra.outputs.instance_id }}'
+  Public_IP:
+    value: '{{ .grains.terraform_infra.outputs.public_ip }}'
+  Bucket_Name:
+    value: '{{ .grains.terraform_infra.outputs.bucket_name }}'
+  Bucket_ARN:
+    value: '{{ .grains.terraform_infra.outputs.bucket_arn }}'
